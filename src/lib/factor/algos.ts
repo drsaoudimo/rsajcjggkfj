@@ -366,6 +366,7 @@ export function quadraticSieve(n: bigint, maxBlocks: number, expired: Clock): QS
           if (e) exps.push([k, e]);
         }
         if (q === 1n) {
+          if (relX.length && relX[relX.length - 1] === x) continue;
           relX.push(x);
           relExp.push(exps);
           if (relX.length >= need) break;
@@ -386,7 +387,7 @@ export function quadraticSieve(n: bigint, maxBlocks: number, expired: Clock): QS
   const nRel = relX.length;
   const words = (nFB + nRel + 31) >>> 5;
   const lastW = (nFB - 1) >>> 5;
-  const lastMask = nFB % 32 === 0 ? 0xffffffff : (1 << nFB % 32) - 1;
+  const lastMask = nFB % 32 === 0 ? 0xffffffff : ((1 << nFB % 32) >>> 0) - 1;
   const pivots: Array<Uint32Array | undefined> = new Array(nFB);
   for (let i = 0; i < nRel; i++) {
     const row = new Uint32Array(words);
