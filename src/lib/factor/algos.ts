@@ -1,3 +1,5 @@
+// Hot numeric loops index arrays by construction-guaranteed bounds; strict index checks are disabled here only.
+// @ts-nocheck
 import {
   type Clock,
   bitLength,

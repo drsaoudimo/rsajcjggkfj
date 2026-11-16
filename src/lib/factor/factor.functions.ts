@@ -21,10 +21,10 @@ type Stage = "check" | "trial" | "rho" | "pm1" | "ecm" | "qs";
 export interface StageInput {
   n: string;
   stage: Stage;
-  rho?: { c: string; x: string; y: string; iters: number };
-  B1?: number;
-  B2?: number;
-  sigma?: number;
+  rho?: { c: string; x: string; y: string; iters: number } | undefined;
+  B1?: number | undefined;
+  B2?: number | undefined;
+  sigma?: number | undefined;
 }
 
 export const runStage = createServerFn({ method: "POST" })
