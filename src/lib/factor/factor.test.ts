@@ -23,7 +23,7 @@ describe("factoring algorithms", () => {
     expect([193707721n, 761838257287n]).toContain(r.factor);
   });
   it("p-1 finds a smooth-minus-one factor", () => {
-    const p = 2n * 3n ** 5n * 5n ** 3n * 7n * 11n * 13n * 101n + 1n; // check prime below
+    const p = 2n * 3n ** 5n * 5n ** 3n * 7n * 11n * 13n * 7n + 1n;
     expect(isProbablePrime(p)).toBe(true);
     const n = p * 1000000000000000003n;
     expect(pollardPm1(n, 1000, clock()).factor).toBe(p);
