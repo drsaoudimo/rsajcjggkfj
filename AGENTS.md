@@ -28,3 +28,6 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Factoring math lives in src/lib/factor as pure BigInt modules (no Node APIs) so it runs on workerd; server functions run each stage under a ~20s budget and the client chains resumable calls.
