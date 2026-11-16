@@ -96,7 +96,7 @@ function Lab() {
     const push = (row: LogRow) => setLog((l) => [...l.filter((x) => x.stage !== row.stage), row]);
     let found: { f: string; method: string } | null = null;
     try {
-      const chk = (await run({ data: { n, stage: "check" } })) as { prime: boolean };
+      const chk = (await run({ data: { n, stage: "check" } })) as unknown as { prime: boolean };
       if (chk.prime) {
         setError("هذا العدد أولي (Miller-Rabin)، لا يوجد ما يُحلَّل.");
         return;
