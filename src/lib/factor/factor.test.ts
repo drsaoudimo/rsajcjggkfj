@@ -52,3 +52,20 @@ describe("factoring algorithms", () => {
     expect(feasibility(512).verdict).toBe("infeasible");
   });
 });
+
+import { coppersmithHighBits } from "./lattice";
+import { cfrac } from "./cfrac";
+import { generateSemiprime as genSP } from "./bigmath";
+
+describe("lattice and continued fractions", () => {
+  it("Coppersmith recovers a 250-bit p of a 500-bit N from its top 150 bits", () => {
+    const { n, p } = genSP(500, null);
+    const high = (p >> 100n) << 100n;
+    expect(coppersmithHighBits(n, high, 100, () => false).factor).toBe(p);
+  });
+  it("CFRAC factors an 80-bit semiprime", () => {
+    const { n, p, q } = genSP(80, null);
+    const f = cfrac(n, () => false).factor;
+    expect(f === p || f === q).toBe(true);
+  });
+});

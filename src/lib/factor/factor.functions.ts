@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateSemiprime, isProbablePrime, makeClock } from "./bigmath";
+import { coppersmithHighBits } from "./lattice";
+import { cfrac } from "./cfrac";
 import { ecmRun, pollardPm1, pollardRho, quadraticSieve, trialDivision } from "./algos";
 
 const BUDGET_MS = 20000;
@@ -16,7 +18,7 @@ export const generate = createServerFn({ method: "POST" })
     return { n: n.toString(), p: p.toString(), q: q.toString(), ms: performance.now() - t };
   });
 
-type Stage = "check" | "trial" | "rho" | "pm1" | "ecm" | "qs";
+type Stage = "check" | "trial" | "rho" | "pm1" | "ecm" | "qs" | "cfrac" | "copper";
 
 export interface StageInput {
   n: string;
@@ -25,6 +27,8 @@ export interface StageInput {
   B1?: number | undefined;
   B2?: number | undefined;
   sigma?: number | undefined;
+  high?: string | undefined;
+  unknownBits?: number | undefined;
 }
 
 export const runStage = createServerFn({ method: "POST" })
@@ -64,6 +68,16 @@ export const runStage = createServerFn({ method: "POST" })
         const B2 = Math.min(Math.max(data.B2 ?? B1 * 100, B1), 300_000_000);
         const r = ecmRun(n, B1, B2, data.sigma ?? 11, 10000, expired);
         return done({ factor: fac(r.factor), curves: r.curves, nextSigma: r.nextSigma, B1, B2 });
+      }
+      case "cfrac": {
+        const r = cfrac(n, expired);
+        return done({ factor: fac(r.factor), stats: r.stats, reason: r.reason ?? null });
+      }
+      case "copper": {
+        if (!data.high || !/^\d{1,1300}$/.test(data.high)) throw new Error("hint required");
+        const u = Math.max(1, Math.min(2000, Math.round(Number(data.unknownBits))));
+        const r = coppersmithHighBits(n, BigInt(data.high), u, expired);
+        return done({ factor: fac(r.factor), stats: r.stats });
       }
       case "qs": {
         const r = quadraticSieve(n, 100000, expired);
