@@ -247,7 +247,7 @@ function Lab() {
           </div>
         </section>
 
-        <CopperPanel n={n} secret={secret} nBits={nBits} />
+        <CopperPanel key={n} n={n} secret={secret} nBits={nBits} />
 
         <section className="mt-4 rounded-lg border border-border bg-card p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
