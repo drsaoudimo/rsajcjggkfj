@@ -384,7 +384,13 @@ function CopperPanel({ n, secret, nBits }: { n: string; secret: { p: string; q: 
           <button onClick={go} disabled={busy} className="mt-3 w-full rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50">
             {busy ? "يقلّص الشبيكة…" : "استخرج p بالشبيكات"}
           </button>
-          {out && <pre className={`num mt-3 whitespace-pre-wrap break-all text-xs ${ok ? "text-accent" : "text-destructive"}`} dir="ltr">{out}</pre>}
+          {out && (
+            <div className={`mt-3 text-xs ${ok ? "text-accent" : "text-destructive"}`}>
+              {out.split("\n").map((line, i) =>
+                line.startsWith("p = ") ? <pre key={i} className="num whitespace-pre-wrap break-all" dir="ltr">{line}</pre> : <p key={i} className="num mt-1">{line}</p>,
+              )}
+            </div>
+          )}
         </>
       )}
     </section>
