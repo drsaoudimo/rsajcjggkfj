@@ -23,7 +23,7 @@ type Stage = "check" | "trial" | "rho" | "pm1" | "ecm" | "qs" | "cfrac" | "coppe
 export interface StageInput {
   n: string;
   stage: Stage;
-  rho?: { c: string; x: string; y: string; iters: number } | undefined;
+  rho?: { c: string; x: string; y: string; iters: number; r?: number; k?: number } | undefined;
   B1?: number | undefined;
   B2?: number | undefined;
   sigma?: number | undefined;
@@ -50,12 +50,12 @@ export const runStage = createServerFn({ method: "POST" })
         return done({ factor: fac(trialDivision(n, 200000)), detail: "primes ≤ 200,000 + perfect square" });
       case "rho": {
         const s = data.rho
-          ? { c: BigInt(data.rho.c), x: BigInt(data.rho.x), y: BigInt(data.rho.y), iters: data.rho.iters }
-          : { c: 1n, x: 2n, y: 2n, iters: 0 };
+          ? { c: BigInt(data.rho.c), x: BigInt(data.rho.x), y: BigInt(data.rho.y), iters: data.rho.iters, r: data.rho.r ?? 1, k: data.rho.k ?? 0 }
+          : { c: 1n, x: 2n, y: 2n, iters: 0, r: 1, k: 0 };
         const r = pollardRho(n, s, 5_000_000, expired);
         return done({
           factor: fac(r.factor),
-          rho: { c: r.state.c.toString(), x: r.state.x.toString(), y: r.state.y.toString(), iters: r.state.iters },
+          rho: { c: r.state.c.toString(), x: r.state.x.toString(), y: r.state.y.toString(), iters: r.state.iters, r: r.state.r ?? 1, k: r.state.k ?? 0 },
         });
       }
       case "pm1": {

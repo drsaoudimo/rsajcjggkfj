@@ -47,7 +47,7 @@ export function cfrac(n: bigint, expired: () => boolean): { factor: bigint | nul
     if (sign < 0) e[0] = 1;
     for (let i = 1; i < nFB && q > 1n; i++) {
       const p = fb[i]!;
-      while (q % p === 0n) { q /= p; e[i]++; }
+      while (q % p === 0n) { q /= p; e[i] = e[i]! + 1; }
     }
     if (q === 1n) { relA.push(A); relE.push(e); }
     a = (r0 + P) / Q;
@@ -82,7 +82,7 @@ export function cfrac(n: bigint, expired: () => boolean): { factor: bigint | nul
           const h = nFB + r;
           if (row[h >>> 5]! & (1 << (h & 31))) {
             Xv = (Xv * relA[r]!) % n;
-            for (let k = 0; k < nFB; k++) tot[k] += relE[r]![k]!;
+            for (let k = 0; k < nFB; k++) tot[k] = tot[k]! + relE[r]![k]!;
           }
         }
         let Y = 1n;

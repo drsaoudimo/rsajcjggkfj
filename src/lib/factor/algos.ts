@@ -32,12 +32,15 @@ export function trialDivision(n: bigint, limit: number): bigint | null {
 /* ------------------------------------------------------------------ */
 export interface RhoState {
   c: bigint;
-  x: bigint;
-  y: bigint;
+  x: bigint; // Brent: saved point at the last power of two
+  y: bigint; // Brent: running point
   iters: number;
+  r?: number; // current power-of-two window
+  k?: number; // steps taken inside the window
 }
-export const rhoInitial = (): RhoState => ({ c: 1n, x: 2n, y: 2n, iters: 0 });
+export const rhoInitial = (): RhoState => ({ c: 1n, x: 2n, y: 2n, iters: 0, r: 1, k: 0 });
 
+/** Pollard rho with Brent's cycle detection (ZF-16.1): one f() per step instead of three, batched gcd. */
 export function pollardRho(
   n: bigint,
   state: RhoState,
@@ -45,43 +48,46 @@ export function pollardRho(
   expired: Clock,
 ): { factor: bigint | null; state: RhoState } {
   let { c, x, y, iters } = state;
+  let r = state.r ?? 1;
+  let k = state.k ?? 0;
   const startIters = iters;
   const f = (v: bigint) => (v * v + c) % n;
-  let q = 1n;
   while (iters - startIters < maxIters) {
     if (expired()) break;
-    const sx = x;
-    const sy = y;
-    for (let i = 0; i < 128; i++) {
-      x = f(x);
-      y = f(f(y));
-      const d = x > y ? x - y : y - x;
-      q = (q * d) % n;
+    const ys = y;
+    const ks = k;
+    const m = Math.min(128, r - k);
+    let q = 1n;
+    for (let i = 0; i < m; i++) {
+      y = f(y);
+      q = (q * (x > y ? x - y : y - x)) % n;
     }
-    iters += 128;
+    iters += m;
+    k += m;
     let g = gcd(q, n);
-    if (g === 1n) {
-      q = 1n;
-      continue;
-    }
-    // backtrack inside the batch to isolate the factor
-    x = sx;
-    y = sy;
-    do {
-      x = f(x);
-      y = f(f(y));
-      g = gcd(x > y ? x - y : y - x, n);
-    } while (g === 1n);
-    if (g === n) {
-      c += 1n; // cycle collapsed: new polynomial
+    if (g !== 1n) {
+      let z = ys;
+      for (let i = 0; i < m; i++) {
+        z = f(z);
+        g = gcd(x > z ? x - z : z - x, n);
+        if (g !== 1n) break;
+      }
+      if (g !== n && g !== 1n) return { factor: g, state: { c, x, y, iters, r, k } };
+      c += 1n;
       x = 2n;
       y = 2n;
-      q = 1n;
+      r = 1;
+      k = 0;
       continue;
     }
-    return { factor: g, state: { c, x, y, iters } };
+    if (k >= r) {
+      x = y;
+      r *= 2;
+      k = 0;
+    }
+    void ks;
   }
-  return { factor: null, state: { c, x, y, iters } };
+  return { factor: null, state: { c, x, y, iters, r, k } };
 }
 
 /* ------------------------------------------------------------------ */

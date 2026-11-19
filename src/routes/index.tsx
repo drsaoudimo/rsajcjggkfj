@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
 type StageKey = "trial" | "rho" | "pm1" | "ecm" | "cfrac" | "qs";
 const STAGES: { key: StageKey; name: string; note: string }[] = [
   { key: "trial", name: "القسمة التجريبية", note: "أوليات ≤ 200,000" },
-  { key: "rho", name: "Pollard ρ", note: "~√p خطوة" },
+  { key: "rho", name: "Pollard ρ (Brent)", note: "~√p خطوة، دالة واحدة لكل خطوة" },
   { key: "pm1", name: "Pollard p−1", note: "إذا كان p−1 أملس" },
   { key: "ecm", name: "ECM (Suyama)", note: "يعتمد على حجم أصغر عامل" },
   { key: "cfrac", name: "الكسور المستمرة CFRAC", note: "تقاربات √N + GF(2)" },
@@ -122,7 +122,7 @@ function Lab() {
           push({ stage: key, status: "skip", ms: 0, calls: 0, detail: "تخطي: QS غير مجدٍ فوق 200 بت" });
           continue;
         }
-        let rho: { c: string; x: string; y: string; iters: number } | undefined;
+        let rho: { c: string; x: string; y: string; iters: number; r?: number; k?: number } | undefined;
         let sigma = 11;
         let curves = 0;
         let detail = "";
