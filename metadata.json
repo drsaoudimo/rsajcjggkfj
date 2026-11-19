@@ -1,0 +1,8 @@
+{
+  "name": "Copy of حلال المصفوفات الكمومي",
+  "description": "محرك استدلال رياضي عالي الدقة يستخدم منهجية النمذجة المصفوفية والذكاء الاصطناعي لمحاكاة البرمجيات الكمومية على الأجهزة التقليدية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
